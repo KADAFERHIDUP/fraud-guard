@@ -1,0 +1,131 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>fraud-guard · Mesin anti-fraud dan AML</title>
+  <meta name="description" content="Mesin anti-fraud dan AML: skor risiko transaksi yang bisa dijelaskan, antrian kasus dengan persetujuan 4 mata, laporan LTKT dan LTKM, dan log audit berantai.">
+  <meta name="author" content="Ahmad Umraithi">
+  <link rel="icon" href="favicon.svg" type="image/svg+xml">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500&family=Public+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="app.css">
+</head>
+<body>
+  <header class="bar">
+    <div class="bar-in">
+      <p class="brand">fraud-guard</p>
+      <p class="tag">Setiap transaksi dinilai, setiap keputusan bisa dijelaskan.</p>
+      <div class="role" role="group" aria-label="Masuk sebagai">
+        <button type="button" id="role-analyst" aria-pressed="true">Analis</button>
+        <button type="button" id="role-supervisor" aria-pressed="false">Supervisor</button>
+      </div>
+    </div>
+  </header>
+
+  <section class="start" id="start">
+    <div>
+      <h1>Ruang kerja analis anti-fraud dan AML</h1>
+      <p>Sandbox berisi satu bank kecil dengan tiga nasabah dan riwayat transaksi 30 hari. Kirim transaksi lewat API, lihat skor risikonya dihitung, lalu putuskan kasusnya sebagai analis dan supervisor. Semua data hanya milik sandbox kamu dan hilang setelah 24 jam.</p>
+      <button type="button" class="btn" id="b-start">Buka sandbox</button>
+      <p class="err" id="start-err" role="alert"></p>
+    </div>
+  </section>
+
+  <main class="desk" id="desk" hidden>
+    <section class="col send" aria-labelledby="send-h">
+      <h2 id="send-h">Kirim transaksi</h2>
+      <p class="sub">Skenario siap pakai. Tiap tombol mengirim satu atau beberapa transaksi ke <code>POST /api/transactions</code> dengan API key sistem core banking.</p>
+      <div class="scenarios" id="scenarios"></div>
+
+      <details class="manual">
+        <summary>Transaksi manual</summary>
+        <form id="manual" novalidate>
+          <label>Rekening <select id="m-acc"></select></label>
+          <label>Jenis
+            <select id="m-type">
+              <option value="TRANSFER_OUT">Transfer keluar</option>
+              <option value="TRANSFER_IN">Transfer masuk</option>
+              <option value="CASH_DEPOSIT">Setor tunai</option>
+              <option value="CASH_WITHDRAWAL">Tarik tunai</option>
+            </select>
+          </label>
+          <label>Nominal (Rp) <input id="m-amt" inputmode="decimal" value="2500000"></label>
+          <label>Rekening lawan <input id="m-cp" inputmode="numeric" value="7009000001" maxlength="20"></label>
+          <label>Perangkat <input id="m-dev" value="HP-AHMAD-01" maxlength="40"></label>
+          <button type="submit" class="btn">Kirim</button>
+          <p class="err" id="m-err" role="alert"></p>
+        </form>
+      </details>
+
+      <h3>Nasabah</h3>
+      <ul class="accounts" id="accounts"></ul>
+    </section>
+
+    <section class="col verdict" aria-labelledby="verdict-h" aria-live="polite">
+      <h2 id="verdict-h">Keputusan terakhir</h2>
+      <div class="empty" id="v-empty">Belum ada transaksi. Mulai dari salah satu skenario.</div>
+      <div id="v" hidden>
+        <p class="v-txn mono" id="v-txn"></p>
+        <div class="gauge">
+          <p class="score"><span id="v-score">0</span><small>/100</small></p>
+          <p class="outcome" id="v-outcome"></p>
+        </div>
+        <div class="track" aria-hidden="true">
+          <div class="segs" id="v-segs"></div>
+          <i class="mark m40"><span>tahan 40</span></i>
+          <i class="mark m70"><span>blokir 70</span></i>
+        </div>
+        <ol class="reasons" id="v-reasons"></ol>
+        <p class="v-foot" id="v-foot"></p>
+      </div>
+
+      <h3>Transaksi terbaru</h3>
+      <table class="list">
+        <thead><tr><th>Waktu</th><th>Rekening</th><th>Jenis</th><th class="num">Nominal</th><th class="num">Skor</th><th>Keputusan</th></tr></thead>
+        <tbody id="txns"></tbody>
+      </table>
+    </section>
+
+    <section class="col work" aria-labelledby="work-h">
+      <div class="tabs" role="tablist">
+        <button type="button" role="tab" id="t-cases" aria-selected="true">Kasus</button>
+        <button type="button" role="tab" id="t-reports" aria-selected="false">Laporan PPATK</button>
+        <button type="button" role="tab" id="t-audit" aria-selected="false">Audit</button>
+      </div>
+
+      <div id="p-cases" role="tabpanel">
+        <h2 id="work-h" class="sr">Kasus</h2>
+        <ul class="cases" id="cases"></ul>
+        <article class="case" id="case" hidden>
+          <header><button type="button" class="link" id="case-back">← Semua kasus</button><span class="pill" id="c-status"></span></header>
+          <h3 id="c-title"></h3>
+          <p class="mono c-meta" id="c-meta"></p>
+          <ol class="reasons small" id="c-reasons"></ol>
+          <div class="actions" id="c-actions"></div>
+          <h4>Riwayat</h4>
+          <ol class="steps" id="c-steps"></ol>
+        </article>
+      </div>
+
+      <div id="p-reports" role="tabpanel" hidden>
+        <p class="sub">LTKT dibuat otomatis untuk transaksi tunai Rp500 juta ke atas. LTKM baru dibuat setelah supervisor menyetujui usulan analis.</p>
+        <ul class="reports" id="reports"></ul>
+      </div>
+
+      <div id="p-audit" role="tabpanel" hidden>
+        <p class="sub">Setiap entri menyimpan hash entri sebelumnya. Mengubah satu entri lama memutus rantai sesudahnya.</p>
+        <p class="chain" id="chain"></p>
+        <ol class="audit" id="audit"></ol>
+      </div>
+    </section>
+  </main>
+
+  <footer class="foot">
+    <p><strong>Ahmad Umraithi</strong>, Teknik Informatika Universitas Malikussaleh. Simulasi untuk belajar; data dan daftar pantauan bukan data sungguhan.</p>
+    <p><a href="https://github.com/KADAFERHIDUP/fraud-guard">Kode di GitHub</a> · <a href="https://www.linkedin.com/in/ahmadumraithi/">LinkedIn</a></p>
+  </footer>
+  <script src="app.js"></script>
+</body>
+</html>

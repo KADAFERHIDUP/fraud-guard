@@ -1,0 +1,50 @@
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: '21'
+          cache: maven
+      - name: Build dan test
+        run: mvn -B -ntp verify
+
+  docker:
+    runs-on: ubuntu-latest
+    needs: test
+    steps:
+      - uses: actions/checkout@v4
+      - name: Build image
+        run: docker build -t fraud-guard:ci .
+      - name: Jalankan dan tunggu sehat
+        run: |
+          docker run -d --name fg -p 8080:8080 fraud-guard:ci
+          for i in $(seq 1 30); do
+            status=$(docker inspect -f '{{.State.Health.Status}}' fg)
+            echo "health: $status"
+            [ "$status" = "healthy" ] && break
+            sleep 2
+          done
+          [ "$(docker inspect -f '{{.State.Health.Status}}' fg)" = "healthy" ] || { docker logs fg; exit 1; }
+      - name: Uji asap
+        run: |
+          curl -fsS http://localhost:8080/ | grep -q 'fraud-guard'
+          curl -fsS http://localhost:8080/app.js > /dev/null
+          sb=$(curl -fsS -X POST -H 'Content-Type: application/json' -d '{}' http://localhost:8080/api/sandbox)
+          key=$(echo "$sb" | grep -o '"apiKey":"[^"]*"' | cut -d'"' -f4)
+          res=$(curl -fsS -H "Authorization: Bearer $key" -H 'Content-Type: application/json' \
+            -d '{"id":"CI-1","accountNo":"7001002001","type":"TRANSFER_OUT","amount":"1000000.00","counterpartyAccount":"8899001122"}' \
+            http://localhost:8080/api/transactions)
+          echo "$res"
+          echo "$res" | grep -q '"decision":"BLOCK"'
+          # tanpa token harus 401
+          [ "$(curl -s -o /dev/null -w '%{http_code}' http://localhost:8080/api/cases)" = "401" ]
