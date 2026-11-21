@@ -1,0 +1,191 @@
+<!doctype html>
+<html lang="id">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>fraud-guard · Mesin anti-fraud dan AML oleh Ahmad Umraithi</title>
+  <meta name="description" content="Mesin anti-fraud dan AML: skor risiko transaksi yang bisa dijelaskan, keputusan lolos, tahan, atau blokir, kasus dengan persetujuan 4 mata, laporan LTKT dan LTKM, dan log audit berantai. Java 21 tanpa framework.">
+  <meta name="theme-color" content="#1b2420">
+  <meta property="og:title" content="fraud-guard · Mesin anti-fraud dan AML">
+  <meta property="og:description" content="Setiap transaksi dinilai, setiap keputusan bisa dijelaskan.">
+  <meta property="og:image" content="https://fraud.kadaferhidup.my.id/konsol.webp">
+  <link rel="icon" href="favicon.svg" type="image/svg+xml">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;700&family=Public+Sans:wght@400;500;600;700;800&display=swap">
+  <style>
+    :root {
+      --paper: #f1f3ef; --card: #fff; --ink: #1b2420; --ink-2: #56625c; --rule: #d8ddd8; --teal: #0e4d52;
+      --allow: #2f7d4f; --review: #a86a12; --block: #b42318;
+      --sans: 'Public Sans', system-ui, -apple-system, 'Segoe UI', sans-serif;
+      --mono: 'JetBrains Mono', ui-monospace, Consolas, monospace;
+    }
+    * { box-sizing: border-box; margin: 0; }
+    html { scroll-behavior: smooth; }
+    @media (prefers-reduced-motion: reduce) { html { scroll-behavior: auto; } }
+    body { background: var(--paper); color: var(--ink); font: 400 17px/1.6 var(--sans); }
+    a { color: var(--teal); }
+    :focus-visible { outline: 3px solid var(--teal); outline-offset: 3px; border-radius: 4px; }
+    code { font-family: var(--mono); font-size: .88em; }
+    .wrap { max-width: 1160px; margin: 0 auto; padding: 0 clamp(20px, 4vw, 48px); }
+
+    .top { background: var(--ink); color: #fff; }
+    .top .wrap { display: flex; justify-content: space-between; align-items: center; gap: 16px; padding-top: 18px; padding-bottom: 18px; flex-wrap: wrap; }
+    .brand { font: 700 19px var(--mono); color: #fff; text-decoration: none; }
+    .top nav { display: flex; gap: 22px; font-size: 15px; flex-wrap: wrap; }
+    .top nav a { color: #c3cdc8; text-decoration: none; }
+    .top nav a:hover { color: #fff; }
+
+    .hero { background: var(--ink); color: #fff; padding: clamp(40px, 7vw, 96px) 0 0; }
+    .hero h1 { max-width: 15ch; font-size: clamp(40px, 6.6vw, 82px); line-height: 1; letter-spacing: -.04em; font-weight: 800; }
+    .hero .lede { margin-top: 24px; max-width: 38em; font-size: 19px; color: #c3cdc8; }
+    .ctas { display: flex; flex-wrap: wrap; gap: 12px; margin-top: 30px; }
+    .btn { display: inline-flex; align-items: center; min-height: 52px; padding: 0 24px; border-radius: 10px; font-weight: 600; text-decoration: none; }
+    .btn-light { background: #fff; color: var(--ink); }
+    .btn-line { color: #fff; box-shadow: inset 0 0 0 1.5px #56625c; }
+    .btn-line:hover { box-shadow: inset 0 0 0 1.5px #fff; }
+    .pending { margin-top: 14px; font-size: 14px; color: #93a19a; }
+    .shot { margin-top: clamp(36px, 5vw, 56px); border-radius: 14px 14px 0 0; overflow: hidden; box-shadow: 0 -20px 60px -30px #000; }
+    .shot img { display: block; width: 100%; height: auto; }
+
+    section { padding: clamp(56px, 8vw, 100px) 0 0; }
+    h2 { font-size: clamp(28px, 4vw, 44px); line-height: 1.08; letter-spacing: -.03em; font-weight: 800; max-width: 20em; }
+    .sub { margin-top: 12px; max-width: 42em; color: var(--ink-2); }
+
+    .outcomes { display: grid; grid-template-columns: repeat(3, 1fr); gap: 14px; margin-top: 28px; }
+    @media (max-width: 760px) { .outcomes { grid-template-columns: 1fr; } }
+    .outcome { background: var(--card); border: 1px solid var(--rule); border-top: 6px solid var(--c); border-radius: 10px; padding: 18px 20px; }
+    .outcome b { display: block; font: 700 14px var(--mono); color: var(--c); }
+    .outcome strong { display: block; margin: 6px 0 4px; font-size: 22px; }
+    .outcome p { color: var(--ink-2); font-size: 15.5px; }
+    .score-img { margin-top: 28px; max-width: 608px; border: 1px solid var(--rule); border-radius: 10px; overflow: hidden; background: #fff; }
+    .score-img img { display: block; width: 100%; height: auto; }
+
+    table { width: 100%; margin-top: 24px; border-collapse: collapse; background: var(--card); border: 1px solid var(--rule); border-radius: 10px; overflow: hidden; font-size: 15px; }
+    th, td { text-align: left; padding: 11px 14px; border-bottom: 1px solid #e8ebe8; vertical-align: top; }
+    th { font-size: 13px; color: var(--ink-2); font-weight: 600; background: #f8f9f7; }
+    td:first-child { font-family: var(--mono); font-size: 13px; white-space: nowrap; }
+    td.pts { font-family: var(--mono); font-weight: 700; color: var(--block); white-space: nowrap; }
+    @media (max-width: 640px) { td:first-child { white-space: normal; word-break: break-word; } th, td { padding: 9px 8px; } table { font-size: 14px; } }
+
+    .guards { display: grid; grid-template-columns: repeat(2, 1fr); gap: 14px; margin-top: 28px; }
+    @media (max-width: 760px) { .guards { grid-template-columns: 1fr; } }
+    .guard { background: var(--card); border: 1px solid var(--rule); border-radius: 10px; padding: 18px 20px; }
+    .guard dt { font-weight: 700; }
+    .guard dd { margin-top: 6px; color: var(--ink-2); font-size: 15.5px; }
+
+    pre { margin-top: 24px; padding: 18px 20px; background: #0f1714; color: #dbe5df; border-radius: 10px; overflow-x: auto; font: 13.5px/1.6 var(--mono); }
+    pre .c { color: #8fa39a; }
+    .stack { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 24px; padding: 0; list-style: none; }
+    .stack li { padding: 6px 12px; border: 1px solid var(--rule); border-radius: 999px; background: #fff; font: 500 13px var(--mono); }
+
+    footer { margin-top: clamp(56px, 8vw, 100px); padding: 32px 0 48px; border-top: 1px solid var(--rule); font-size: 15px; color: var(--ink-2); }
+    footer .wrap { display: flex; justify-content: space-between; gap: 20px; flex-wrap: wrap; }
+    footer p { margin: 4px 0; }
+  </style>
+</head>
+<body>
+  <div class="top">
+    <div class="wrap">
+      <a class="brand" href="#">fraud-guard</a>
+      <nav aria-label="Navigasi">
+        <a href="#keputusan">Keputusan</a>
+        <a href="#aturan">Aturan</a>
+        <a href="#pengaman">Pengaman</a>
+        <a href="#api">API</a>
+        <a href="https://github.com/KADAFERHIDUP/fraud-guard">GitHub</a>
+      </nav>
+    </div>
+  </div>
+
+  <header class="hero">
+    <div class="wrap">
+      <h1>Setiap transaksi dinilai. Setiap keputusan bisa dijelaskan.</h1>
+      <p class="lede">Mesin anti-fraud dan anti pencucian uang untuk bank. Sistem core banking mengirim transaksi, fraud-guard menjawab dengan skor risiko, alasan per aturan, dan keputusan lolos, tahan, atau blokir. Kasusnya diputus analis dan disetujui supervisor yang berbeda.</p>
+      <div class="ctas">
+        <a class="btn btn-light" href="https://github.com/KADAFERHIDUP/fraud-guard">Lihat kode di GitHub</a>
+        <a class="btn btn-line" href="#api">Coba lewat API</a>
+      </div>
+      <p class="pending">Demo online segera menyusul. Sementara itu, jalankan di komputer sendiri dengan <code>docker run</code> (lihat bagian API).</p>
+      <figure class="shot"><img src="konsol.webp" width="1440" height="1000" alt="Konsol analis fraud-guard: daftar skenario, keputusan terakhir dengan skor 100 diblokir, tabel transaksi, dan detail kasus yang sudah disetujui supervisor."></figure>
+    </div>
+  </header>
+
+  <main class="wrap">
+    <section id="keputusan" aria-labelledby="keputusan-h">
+      <h2 id="keputusan-h">Tiga jawaban, satu permintaan</h2>
+      <p class="sub">Skor 0–100 dijumlahkan dari aturan yang terpicu. Dari skor itu keluar satu dari tiga keputusan.</p>
+      <div class="outcomes">
+        <div class="outcome" style="--c: var(--allow)"><b>ALLOW · skor &lt; 40</b><strong>Lolos</strong><p>Transaksi dijalankan. Setoran tunai Rp500 juta ke atas tetap otomatis dibuatkan LTKT.</p></div>
+        <div class="outcome" style="--c: var(--review)"><b>REVIEW · skor 40–69</b><strong>Ditahan</strong><p>Dana ditahan dan kasus dibuka untuk analis. Kalau dilepas, transaksinya berjalan.</p></div>
+        <div class="outcome" style="--c: var(--block)"><b>BLOCK · skor ≥ 70</b><strong>Diblokir</strong><p>Transaksi ditolak. Daftar pantauan dan rekening yang dibekukan langsung diblokir berapa pun skornya.</p></div>
+      </div>
+      <figure class="score-img"><img src="skor.webp" width="608" height="210" alt="Skor 90 dari 100, diblokir. Batang skor tersusun dari empat aturan, dengan garis batas tahan di 40 dan blokir di 70." loading="lazy"></figure>
+    </section>
+
+    <section id="aturan" aria-labelledby="aturan-h">
+      <h2 id="aturan-h">Aturan yang bisa dibaca auditor</h2>
+      <p class="sub">Tidak ada kotak hitam. Setiap aturan punya poin tetap dan menulis kalimat penjelasannya sendiri.</p>
+      <table>
+        <thead><tr><th>Aturan</th><th>Poin</th><th>Kapan terpicu</th></tr></thead>
+        <tbody>
+          <tr><td>WATCHLIST</td><td class="pts">blokir</td><td>Rekening lawan ada di daftar pantauan (simulasi DTTOT)</td></tr>
+          <tr><td>STRUCTURING</td><td class="pts">45</td><td>Tiga setoran tunai atau lebih dalam 24 jam, masing-masing di bawah batas lapor, totalnya mencapai batas</td></tr>
+          <tr><td>VELOCITY</td><td class="pts">25 / 40</td><td>5 / 10 transaksi keluar dalam 10 menit</td></tr>
+          <tr><td>PASS_THROUGH</td><td class="pts">35</td><td>Dana masuk lalu langsung keluar dalam 1 jam, pola rekening penampung</td></tr>
+          <tr><td>UNUSUAL_AMOUNT</td><td class="pts">25</td><td>Lebih dari 5× rata-rata transaksi keluar 30 hari</td></tr>
+          <tr><td>NEW_ACCOUNT</td><td class="pts">20</td><td>Rekening berumur kurang dari 7 hari mengirim Rp10 juta ke atas</td></tr>
+          <tr><td>INCOME_MISMATCH</td><td class="pts">20</td><td>Dana keluar 30 hari lebih dari 3× penghasilan yang dilaporkan</td></tr>
+          <tr><td>NEW_COUNTERPARTY · NEW_DEVICE</td><td class="pts">15</td><td>Penerima atau perangkat yang belum pernah dipakai, untuk nominal besar</td></tr>
+          <tr><td>LARGE_AMOUNT · JUST_BELOW_REPORT</td><td class="pts">15</td><td>Nominal Rp100 juta ke atas, atau setoran tunai tepat di bawah batas lapor</td></tr>
+          <tr><td>ODD_HOUR · HIGH_RISK_CUSTOMER</td><td class="pts">10</td><td>Transaksi besar pukul 00.00–03.59 WIB, atau nasabah berprofil risiko tinggi</td></tr>
+        </tbody>
+      </table>
+    </section>
+
+    <section id="pengaman" aria-labelledby="pengaman-h">
+      <h2 id="pengaman-h">Pengaman di backend</h2>
+      <dl class="guards">
+        <div class="guard"><dt>Prinsip 4 mata</dt><dd>Hanya analis pemegang kasus yang bisa mengusulkan, hanya supervisor yang bisa menyetujui, dan penyetuju tidak boleh sama dengan pengusul.</dd></div>
+        <div class="guard"><dt>Burst paralel tetap terhitung</dt><dd>Transaksi satu rekening dinilai bergiliran di bawah kunci rekening. Dua belas transaksi serentak menghasilkan tepat tiga yang ditahan.</dd></div>
+        <div class="guard"><dt>Audit tahan manipulasi</dt><dd>Setiap entri menyimpan hash entri sebelumnya. Mengubah satu entri lama memutus rantai, dan verifikasi menunjuk entri yang rusak.</dd></div>
+        <div class="guard"><dt>Kredensial dengan satu fungsi</dt><dd>API key hanya mengirim transaksi, token analis memeriksa, token supervisor menyetujui. Yang disimpan hanya hash-nya.</dd></div>
+        <div class="guard"><dt>Keputusan tidak bisa ditimpa</dt><dd>ID transaksi yang sama mendapat jawaban pertama. ID sama dengan isi berbeda ditolak.</dd></div>
+        <div class="guard"><dt>LTKM lewat persetujuan</dt><dd>Laporan transaksi mencurigakan baru dibuat setelah usulan analis disetujui supervisor.</dd></div>
+      </dl>
+    </section>
+
+    <section id="api" aria-labelledby="api-h">
+      <h2 id="api-h">Dipakai lewat API</h2>
+      <p class="sub">Konsol web memakai API yang sama dengan sistem core banking. Jalankan di komputer sendiri:</p>
+<pre><code><span class="c"># jalankan server</span>
+docker build -t fraud-guard . &amp;&amp; docker run -p 8080:8080 fraud-guard
+
+<span class="c"># buat sandbox: dapat apiKey, analystToken, supervisorToken</span>
+curl -s -X POST localhost:8080/api/sandbox -H 'Content-Type: application/json' -d '{}'
+
+<span class="c"># kirim transaksi untuk dinilai</span>
+curl -s localhost:8080/api/transactions \
+  -H "Authorization: Bearer $API_KEY" -H 'Content-Type: application/json' \
+  -d '{"id":"TRX-001","accountNo":"7001002003","type":"TRANSFER_OUT",
+       "amount":"48000000.00","counterpartyAccount":"7009222222"}'</code></pre>
+      <ul class="stack" aria-label="Teknologi">
+        <li>Java 21</li><li>com.sun.net.httpserver</li><li>Virtual threads</li><li>SHA-256 hash chain</li><li>JUnit 5</li><li>Docker</li><li>GitHub Actions</li>
+      </ul>
+    </section>
+  </main>
+
+  <footer>
+    <div class="wrap">
+      <div>
+        <p><strong>Ahmad Umraithi</strong>, Teknik Informatika Universitas Malikussaleh</p>
+        <p>Project lain: <a href="https://minibank.kadaferhidup.my.id">MiniBank</a> · <a href="https://qris.kadaferhidup.my.id">qris-sim</a> · <a href="https://github.com/KADAFERHIDUP/snap-sim">snap-sim</a></p>
+      </div>
+      <div>
+        <p><a href="https://www.linkedin.com/in/ahmadumraithi/">LinkedIn</a> · <a href="https://github.com/KADAFERHIDUP">GitHub</a></p>
+        <p>Simulasi untuk belajar. Daftar pantauan dan angka ambang bukan data resmi.</p>
+      </div>
+    </div>
+  </footer>
+</body>
+</html>
