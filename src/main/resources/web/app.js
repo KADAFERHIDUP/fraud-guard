@@ -145,12 +145,12 @@
           el('div', { class: 'row' }, el('button', { type: 'button', class: 'btn', onclick: act('propose', () => ({ resolution: sel.value, note: note.value })) }, 'Kirim usulan')), err];
       }
       if (c.status === 'PENDING_APPROVAL') return [el('p', {}, `Usulan ${RES[c.proposal]} menunggu supervisor. Pindah ke peran Supervisor di kanan atas untuk menyetujui, lalu coba setujui sebagai analis untuk melihat penolakannya.`),
-        el('div', { class: 'row' }, el('button', { type: 'button', class: 'btn ghost', onclick: act('approve') }, 'Coba setujui sendiri')), err];
+        el('div', { class: 'row' }, el('button', { type: 'button', class: 'btn try', onclick: act('approve') }, 'Coba setujui sendiri')), err];
     } else {
       if (c.status === 'PENDING_APPROVAL') return [el('p', {}, `Usulan analis: ${RES[c.proposal]}.`), note,
         el('div', { class: 'row' }, el('button', { type: 'button', class: c.proposal === 'RELEASE' ? 'btn' : 'btn danger', onclick: act('approve', () => ({ note: note.value })) }, 'Setujui'),
           el('button', { type: 'button', class: 'btn ghost', onclick: act('send-back', () => ({ note: note.value })) }, 'Kembalikan ke analis')), err];
-      if (c.status === 'OPEN') return [el('p', {}, 'Supervisor tidak mengambil kasus. Pindah ke peran Analis.'), el('div', { class: 'row' }, el('button', { type: 'button', class: 'btn ghost', onclick: act('claim') }, 'Coba ambil')), err];
+      if (c.status === 'OPEN') return [el('p', {}, 'Supervisor tidak mengambil kasus. Pindah ke peran Analis.'), el('div', { class: 'row' }, el('button', { type: 'button', class: 'btn try', onclick: act('claim') }, 'Coba ambil')), err];
     }
     return [el('p', {}, c.status === 'CLOSED' ? `Selesai: ${RES[c.resolution]}.` : 'Tidak ada tindakan untuk peran ini.')];
   }
@@ -211,7 +211,7 @@
       const j = await r.json();
       if (!r.ok) throw new Error(j.message || `HTTP ${r.status}`);
       Object.assign(S, { api: j.apiKey, analyst: j.analystToken, supervisor: j.supervisorToken });
-      $('start').hidden = true; $('desk').hidden = false;
+      $('start').hidden = true; $('desk').hidden = false; $('b-start').hidden = true;
       drawScenarios();
       await refresh();
     } catch (e) { $('start-err').textContent = e.message; $('b-start').disabled = false; }

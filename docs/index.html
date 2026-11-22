@@ -58,7 +58,7 @@
     .outcome b { display: block; font: 700 14px var(--mono); color: var(--c); }
     .outcome strong { display: block; margin: 6px 0 4px; font-size: 22px; }
     .outcome p { color: var(--ink-2); font-size: 15.5px; }
-    .score-img { margin-top: 28px; max-width: 608px; border: 1px solid var(--rule); border-radius: 10px; overflow: hidden; background: #fff; }
+    .score-img { margin-top: 28px; max-width: 550px; border: 1px solid var(--rule); border-radius: 10px; overflow: hidden; background: #fff; }
     .score-img img { display: block; width: 100%; height: auto; }
 
     table { width: 100%; margin-top: 24px; border-collapse: collapse; background: var(--card); border: 1px solid var(--rule); border-radius: 10px; overflow: hidden; font-size: 15px; }
@@ -107,7 +107,7 @@
         <a class="btn btn-line" href="#api">Coba lewat API</a>
       </div>
       <p class="pending">Demo online segera menyusul. Sementara itu, jalankan di komputer sendiri dengan <code>docker run</code> (lihat bagian API).</p>
-      <figure class="shot"><img src="konsol.webp" width="1440" height="1000" alt="Konsol analis fraud-guard: daftar skenario, keputusan terakhir dengan skor 100 diblokir, tabel transaksi, dan detail kasus yang sudah disetujui supervisor."></figure>
+      <figure class="shot"><img src="konsol.webp" width="1440" height="1000" alt="Konsol fraud-guard: banner hijau, daftar skenario transaksi, keputusan terakhir dengan skor dan alasan per aturan, dan detail kasus untuk analis."></figure>
     </div>
   </header>
 
@@ -120,7 +120,7 @@
         <div class="outcome" style="--c: var(--review)"><b>REVIEW · skor 40–69</b><strong>Ditahan</strong><p>Dana ditahan dan kasus dibuka untuk analis. Kalau dilepas, transaksinya berjalan.</p></div>
         <div class="outcome" style="--c: var(--block)"><b>BLOCK · skor ≥ 70</b><strong>Diblokir</strong><p>Transaksi ditolak. Daftar pantauan dan rekening yang dibekukan langsung diblokir berapa pun skornya.</p></div>
       </div>
-      <figure class="score-img"><img src="skor.webp" width="608" height="210" alt="Skor 90 dari 100, diblokir. Batang skor tersusun dari empat aturan, dengan garis batas tahan di 40 dan blokir di 70." loading="lazy"></figure>
+      <figure class="score-img"><img src="skor.webp" width="550" height="230" alt="Hasil penilaian satu transaksi: skor besar dengan label keputusan, batang skor yang tersusun dari aturan yang terpicu, dan garis batas tahan di 40 dan blokir di 70." loading="lazy"></figure>
     </section>
 
     <section id="aturan" aria-labelledby="aturan-h">
