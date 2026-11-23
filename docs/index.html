@@ -103,10 +103,11 @@
       <h1>Setiap transaksi dinilai. Setiap keputusan bisa dijelaskan.</h1>
       <p class="lede">Mesin anti-fraud dan anti pencucian uang untuk bank. Sistem core banking mengirim transaksi, fraud-guard menjawab dengan skor risiko, alasan per aturan, dan keputusan lolos, tahan, atau blokir. Kasusnya diputus analis dan disetujui supervisor yang berbeda.</p>
       <div class="ctas">
-        <a class="btn btn-light" href="https://github.com/KADAFERHIDUP/fraud-guard">Lihat kode di GitHub</a>
+        <a class="btn btn-light" href="https://fraud-guard-465d7.containers.snapdeploy.app">Coba konsol langsung</a>
+        <a class="btn btn-line" href="https://github.com/KADAFERHIDUP/fraud-guard">Lihat kode di GitHub</a>
         <a class="btn btn-line" href="#api">Coba lewat API</a>
       </div>
-      <p class="pending">Demo online segera menyusul. Sementara itu, jalankan di komputer sendiri dengan <code>docker run</code> (lihat bagian API).</p>
+      <p class="pending">Server demo tidur setelah 15 menit tanpa pengunjung. Kalau muncul halaman "Waking up your container", tunggu sekitar satu menit.</p>
       <figure class="shot"><img src="konsol.webp" width="1440" height="1000" alt="Konsol fraud-guard: banner hijau, daftar skenario transaksi, keputusan terakhir dengan skor dan alasan per aturan, dan detail kasus untuk analis."></figure>
     </div>
   </header>
@@ -157,7 +158,7 @@
 
     <section id="api" aria-labelledby="api-h">
       <h2 id="api-h">Dipakai lewat API</h2>
-      <p class="sub">Konsol web memakai API yang sama dengan sistem core banking. Jalankan di komputer sendiri:</p>
+      <p class="sub">Konsol web memakai API yang sama dengan sistem core banking. Contoh di bawah bisa langsung dicoba ke server demo dengan mengganti <code>localhost:8080</code> menjadi <code>https://fraud-guard-465d7.containers.snapdeploy.app</code>, atau jalankan di komputer sendiri:</p>
 <pre><code><span class="c"># jalankan server</span>
 docker build -t fraud-guard . &amp;&amp; docker run -p 8080:8080 fraud-guard
 

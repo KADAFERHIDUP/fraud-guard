@@ -1,5 +1,9 @@
 # fraud-guard
 
+**Demo langsung:** <https://fraud-guard-465d7.containers.snapdeploy.app> · **Halaman proyek:** <https://fraud.kadaferhidup.my.id>
+
+> Server demo memakai paket gratis SnapDeploy yang tidur setelah 15 menit tanpa pengunjung. Kunjungan pertama menampilkan halaman "Waking up your container" sekitar satu menit, lalu konsolnya terbuka sendiri.
+
 Mesin **anti-fraud dan anti pencucian uang (AML)** untuk bank. Sistem core banking mengirim setiap transaksi ke fraud-guard, lalu fraud-guard menjawab dalam satu permintaan:
 
 - **skor risiko 0–100**, dengan setiap poin dijelaskan oleh aturan yang memicunya;
@@ -78,6 +82,14 @@ curl -s localhost:8080/api/transactions \
 ```
 
 ## Menjalankan
+
+### Online
+
+Versi online berjalan di [SnapDeploy](https://snapdeploy.dev) dari `Dockerfile` di repo ini, dan setiap push ke `main` memicu deploy ulang otomatis. Halaman proyek di `docs/` disajikan GitHub Pages dengan domain `fraud.kadaferhidup.my.id` (file `docs/CNAME`).
+
+Semua contoh API di bawah bisa dijalankan ke server demo dengan mengganti `localhost:8080` menjadi `https://fraud-guard-465d7.containers.snapdeploy.app`.
+
+### Di komputer sendiri
 
 Butuh Java 21 dan Maven.
 
